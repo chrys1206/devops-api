@@ -1,0 +1,23 @@
+name: CI/CD DevOps
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t chrys1206/devops-api:latest ./2-docker/Node-Express-REST-API-MySQL-JS-Example
+
+      - name: Push Docker image
+        run: docker push chrys1206/devops-api:latest
+
+      - name: Deploy to Kubernetes
+        run: kubectl apply -f 3-kubernetes/manifests/

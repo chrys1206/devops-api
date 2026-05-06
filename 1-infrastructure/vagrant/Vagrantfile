@@ -1,0 +1,23 @@
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/bookworm64"
+
+  config.vm.hostname = "devops-vm"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+    vb.cpus = 2
+  end
+
+  config.vm.network "private_network", type: "dhcp"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update -y
+    apt-get install -y curl
+
+    curl -sfL https://get.k3s.io | sh -
+
+    chmod 644 /etc/rancher/k3s/k3s.yaml
+  SHELL
+end
