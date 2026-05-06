@@ -22,11 +22,34 @@ spec:
           env:
             - name: DB_HOST
               value: mysql
-            - name: DB_PORT
-              value: "3306"
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              value: password
             - name: DB_NAME
-              value: api_example
-            - name: DB_USERNAME
+              value: test
+
+            - name: MYSQL_HOST
+              value: mysql
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_USER
               value: root
-            - name: DB_USERNAME_PASSWORD
-              value: root
+            - name: MYSQL_PASSWORD
+              value: password
+            - name: MYSQL_DATABASE
+              value: test
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: devops
+spec:
+  type: NodePort
+  selector:
+    app: api
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30007

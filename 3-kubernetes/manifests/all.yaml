@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devops
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+            - name: MYSQL_DATABASE
+              value: test
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: devops
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: chrys789621/devops-api:2.3
+          imagePullPolicy: Always
+          command: ["npm", "start"]
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              value: password
+            - name: DB_NAME
+              value: test
+            - name: NODE_ENV
+              value: development
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: devops
+spec:
+  type: NodePort
+  selector:
+    app: api
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30007

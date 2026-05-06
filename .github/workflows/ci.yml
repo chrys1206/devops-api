@@ -13,14 +13,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug
-        run: |
-          pwd
-          ls -R
-
       - name: Build Docker image
-        working-directory: 2-docker/Node-Express-REST-API-MySQL-JS-Example
-        run: docker build -t devops-api .
+        run: |
+          docker build -t chrys789621/devops-api:latest ./2-docker/Node-Express-REST-API-MySQL-JS-Example
 
-      - name: Test container
-        run: docker run -d -p 3000:3000 devops-api || true
+      - name: Login Docker Hub
+        run: |
+          echo "hmop667" | docker login -u chrys789621 --password-stdin
+
+      - name: Push Docker image
+        run: |
+          docker push chrys789621/devops-api:latest
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f 3-kubernetes/manifests/
+          kubectl rollout restart deployment api -n devops
