@@ -13,11 +13,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Docker image
-        run: docker build -t chrys1206/devops-api:latest ./2-docker/Node-Express-REST-API-MySQL-JS-Example
+      - name: Debug - list files
+        run: ls -R
 
-      - name: Push Docker image
-        run: docker push chrys1206/devops-api:latest
+      - name: Build Docker image
+        run: docker build -t devops-api ./2-docker/Node-Express-REST-API-MySQL-JS-Example
+
+      - name: Run Docker container (test)
+        run: docker run -d -p 3000:3000 devops-api
 
       - name: Deploy to Kubernetes
-        run: kubectl apply -f 3-kubernetes/manifests/
+        run: |
+          kubectl apply -f 3-kubernetes/manifests/namespace.yaml
+          kubectl apply -f 3-kubernetes/manifests/mysql-deployment.yaml
+          kubectl apply -f 3-kubernetes/manifests/mysql-service.yaml
+          kubectl apply -f 3-kubernetes/manifests/api-deployment.yaml
+          kubectl apply -f 3-kubernetes/manifests/api-service.yaml
